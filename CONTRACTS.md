@@ -144,24 +144,4 @@ Person 6 takes a **copy** of the approved schedule (Interface 5 output,
 then re-runs Interface 4 + 5 logic (lightweight) on just that change —
 without writing back to the real approved schedule.
 
----
 
-## Open items — resolve these THIS WEEK, in order of urgency
-1. **Person 3 + Person 4:** confirm Interface 4's exact field names match her
-   existing validator code — this blocks the optimizer from being usable at all.
-2. **Person 4:** confirm Interface 5's output shape (or paste her actual
-   function signature here).
-3. **Person 2:** confirm how the database will expose Interface 1/2 data —
-   i.e., what function/query other layers call to get pending defect records
-   (rather than reading CSVs directly).
-4. **Person 5 + Person 6:** once Interface 5 is confirmed, both can start
-   building against a hand-written sample JSON file matching the format,
-   without waiting for Person 3's optimizer to be fully done.
-
----
-
-## Golden rule
-If your code's actual output doesn't match what's written here, **update
-this file in the same commit** and mention it to the team — don't let this
-document go stale while the code changes underneath it. A wrong contract is
-worse than no contract, because everyone will trust it blindly.
