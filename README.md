@@ -1,8 +1,6 @@
-# RailOpt — Project Brief for AI-Powered Automatic Block Planning (SIH26027)
-
+# RailOpt — Project Brief for AI-Powered Automatic Block Planning 
 ## What is this project?
-We are building "RailOpt" — an AI-driven system that solves Smart India
-Hackathon problem statement SIH26027, issued by the Ministry of Railways:
+We are building "RailOpt" — an AI-driven system that solves problem statement, issued by the Ministry of Railways:
 "AI-Powered Automatic Block Planning to Maximize Asset Availability for
 Train Operations."
 
