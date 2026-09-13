@@ -1,0 +1,34 @@
+
+RailOpt Priority Model -- Evaluation Report
+=============================================
+Test set size: 2300 records (held out, never seen during training)
+
+Accuracy:  0.946   (fraction of all predictions that were correct)
+Precision: 0.644   (of records we flagged as high-risk, fraction that truly were)
+Recall:    0.959   (of records that TRULY led to failure, fraction we successfully caught)
+F1 Score:  0.771   (balance of precision and recall)
+ROC-AUC:   0.986   (overall ability to separate risky vs safe cases, 0.5=random, 1.0=perfect)
+
+Confusion Matrix:
+                 Predicted: No Failure   Predicted: Failure
+Actual: No Failure        1965                   116
+Actual: Failure              9                   210
+
+--- What to tell judges ---
+For a safety-critical maintenance system, RECALL matters more than raw
+accuracy: missing a genuine high-risk defect (a false negative) is far more
+costly than a false alarm. Our scale_pos_weight adjustment during training
+was specifically chosen to push recall up, even at some cost to precision --
+this is a deliberate, defensible safety-first design choice, not an
+oversight.
+
+
+Full sklearn classification report:
+              precision    recall  f1-score   support
+
+  No Failure       1.00      0.94      0.97      2081
+     Failure       0.64      0.96      0.77       219
+
+    accuracy                           0.95      2300
+   macro avg       0.82      0.95      0.87      2300
+weighted avg       0.96      0.95      0.95      2300

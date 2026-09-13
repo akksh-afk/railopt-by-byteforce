@@ -1,0 +1,3 @@
+task_id,corridor_id,track_segment,start_time,end_time,priority_rank,work_type,horizon,validated_at
+TASK_M01,CORRIDOR_SOUTH,SEG_05,2026-09-02 01:00,2026-09-02 05:00,1,Deep Ballast Screening,monthly_strategic,2026-09-01 03:22:49
+TASK_M02,CORRIDOR_EAST,SEG_02,2026-09-15 00:30,2026-09-15 04:30,3,Signaling Interlocking Test,monthly_strategic,2026-09-01 03:22:49

@@ -1,0 +1,70 @@
+zone,division_name
+NR,Delhi
+NR,Ambala
+NR,Ferozepur
+NR,Lucknow NR
+NR,Moradabad
+NCR,Allahabad
+NCR,Agra
+NCR,Jhansi
+NER,Izzatnagar
+NER,Lucknow NER
+NER,Varanasi
+NFR,Katihar
+NFR,Alipurduar
+NFR,Rangiya
+NFR,Lumding
+NFR,Tinsukia
+NWR,Jaipur
+NWR,Ajmer
+NWR,Bikaner
+NWR,Jodhpur
+ER,Howrah
+ER,Sealdah
+ER,Asansol
+ER,Malda
+ECR,Danapur
+ECR,Dhanbad
+ECR,Mughalsarai
+ECR,Samastipur
+ECR,Sonpur
+ECoR,Khurda Road
+ECoR,Sambalpur
+ECoR,Waltair
+SR,Chennai
+SR,Tiruchirapalli
+SR,Madurai
+SR,Salem
+SR,Palakkad
+SR,Thiruvananthapuram
+SCR,Secunderabad
+SCR,Hyderabad
+SCR,Guntakal
+SCR,Guntur
+SCR,Nanded
+SCR,Vijayawada
+SWR,Bengaluru
+SWR,Mysuru
+SWR,Hubballi
+SER,Kharagpur
+SER,Adra
+SER,Chakradharpur
+SER,Ranchi
+SECR,Bilaspur
+SECR,Raipur
+SECR,Nagpur SECR
+CR,Mumbai CR
+CR,Bhusawal
+CR,Nagpur CR
+CR,Pune
+CR,Solapur
+WR,Mumbai Central
+WR,Ratlam
+WR,Ahmedabad
+WR,Rajkot
+WR,Bhavnagar
+WR,Vadodara
+WCR,Jabalpur
+WCR,Bhopal
+WCR,Kota
+KR,Konkan Railway (single division)

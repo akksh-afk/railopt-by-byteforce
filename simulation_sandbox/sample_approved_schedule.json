@@ -1,0 +1,50 @@
+{
+  "schedule": [
+    {
+      "block_id": "BLK00001",
+      "corridor_id": "COR03213",
+      "from_station": "NDLS",
+      "to_station": "GZB",
+      "start_time": "2026-08-28 09:00",
+      "end_time": "2026-08-28 11:30",
+      "departments": ["Engineering", "Signal & Telecommunication"],
+      "tasks": ["SYN005596", "SYN004448"],
+      "block_type": "traffic_block"
+    },
+    {
+      "block_id": "BLK00002",
+      "corridor_id": "COR03213",
+      "from_station": "NDLS",
+      "to_station": "GZB",
+      "start_time": "2026-08-28 12:00",
+      "end_time": "2026-08-28 13:00",
+      "departments": ["Traction Distribution"],
+      "tasks": ["SYN002211"],
+      "block_type": "power_block"
+    },
+    {
+      "block_id": "BLK00003",
+      "corridor_id": "COR03213",
+      "from_station": "NDLS",
+      "to_station": "GZB",
+      "start_time": "2026-08-28 13:30",
+      "end_time": "2026-08-28 14:30",
+      "departments": ["Engineering"],
+      "tasks": ["SYN003390"],
+      "block_type": "corridor_block"
+    },
+    {
+      "block_id": "BLK00004",
+      "corridor_id": "COR01122",
+      "from_station": "GZB",
+      "to_station": "SRE",
+      "start_time": "2026-08-28 10:00",
+      "end_time": "2026-08-28 13:00",
+      "departments": ["Engineering", "Traction Distribution"],
+      "tasks": ["SYN007781", "SYN007782", "SYN007783"],
+      "block_type": "megablock"
+    }
+  ],
+  "violations": [],
+  "status": "PASS"
+}

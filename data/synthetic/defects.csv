@@ -1,0 +1,16 @@
+record_id,department,corridor_id,zone,defect_type,severity_class,days_overdue,corridor_traffic_density,estimated_repair_duration_hrs,requires_traffic_or_power_block
+D001,Signal & Telecommunication,COR-01,Northern,signal_failure,A,14,45,3,1
+D002,Engineering,COR-02,Northern,ballast_deficiency,C,5,3,2,0
+D003,Traction Distribution,COR-03,Northern,feeder_fault,A,60,30,4,1
+D004,Engineering,COR-01,Northern,rail_fracture,A,22,52,5,1
+D005,Signal & Telecommunication,COR-02,Northern,point_machine_failure,B,9,28,3,1
+D006,Traction Distribution,COR-04,Northern,overhead_equipment_fault,A,18,40,4,1
+D007,Engineering,COR-03,Northern,track_geometry_defect,B,12,33,6,1
+D008,Signal & Telecommunication,COR-05,Northern,track_circuit_failure,B,7,24,2,1
+D009,Engineering,COR-04,Northern,minor_vegetation_growth,C,3,8,2,0
+D010,Traction Distribution,COR-05,Northern,isolator_defect,B,16,31,3,1
+D011,Engineering,COR-06,Northern,sleeper_damage,B,11,21,4,1
+D012,Signal & Telecommunication,COR-06,Northern,signal_lamp_failure,C,4,12,1,0
+D013,Traction Distribution,COR-07,Northern,feeder_trip,A,35,47,5,1
+D014,Engineering,COR-07,Northern,bridge_inspection_overdue,A,28,38,6,1
+D015,Signal & Telecommunication,COR-08,Northern,interlocking_issue,A,20,44,4,1

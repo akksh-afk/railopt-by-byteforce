@@ -1,0 +1,83 @@
+{
+  "status": "DRAFT_READY_FOR_VALIDATION",
+  "generated_by": "OR-Tools CP-SAT Solver v9.15",
+  "total_blocks": 4,
+  "schedule": [
+    {
+      "block_id": "BLK_COR-04_03",
+      "corridor_id": "COR-04",
+      "from_station": "COR-",
+      "to_station": "04",
+      "start_time": "2026-09-01 23:00",
+      "end_time": "2026-09-01 03:00",
+      "duration_hrs": 4.0,
+      "departments": [
+        "Traction Distribution"
+      ],
+      "merged_count": 1,
+      "tasks": [
+        "D006"
+      ],
+      "priority_score": 100.0,
+      "status": "APPROVED",
+      "reason": "OR-Tools CP-SAT merged 1 departmental tasks (Traction Distribution) into a single 4.0h window, saving multiple traffic halts."
+    },
+    {
+      "block_id": "BLK_COR-08_03",
+      "corridor_id": "COR-08",
+      "from_station": "COR-",
+      "to_station": "08",
+      "start_time": "2026-09-01 23:00",
+      "end_time": "2026-09-01 03:00",
+      "duration_hrs": 4.0,
+      "departments": [
+        "Signal & Telecommunication"
+      ],
+      "merged_count": 1,
+      "tasks": [
+        "D015"
+      ],
+      "priority_score": 100.0,
+      "status": "APPROVED",
+      "reason": "OR-Tools CP-SAT merged 1 departmental tasks (Signal & Telecommunication) into a single 4.0h window, saving multiple traffic halts."
+    },
+    {
+      "block_id": "BLK_COR-01_03",
+      "corridor_id": "COR-01",
+      "from_station": "COR-",
+      "to_station": "01",
+      "start_time": "2026-09-01 23:00",
+      "end_time": "2026-09-01 02:00",
+      "duration_hrs": 3.0,
+      "departments": [
+        "Signal & Telecommunication"
+      ],
+      "merged_count": 1,
+      "tasks": [
+        "D001"
+      ],
+      "priority_score": 92.1,
+      "status": "APPROVED",
+      "reason": "OR-Tools CP-SAT merged 1 departmental tasks (Signal & Telecommunication) into a single 3.0h window, saving multiple traffic halts."
+    },
+    {
+      "block_id": "BLK_COR-03_03",
+      "corridor_id": "COR-03",
+      "from_station": "COR-",
+      "to_station": "03",
+      "start_time": "2026-09-01 23:00",
+      "end_time": "2026-09-01 03:00",
+      "duration_hrs": 4.0,
+      "departments": [
+        "Traction Distribution"
+      ],
+      "merged_count": 1,
+      "tasks": [
+        "D003"
+      ],
+      "priority_score": 76.7,
+      "status": "APPROVED",
+      "reason": "OR-Tools CP-SAT merged 1 departmental tasks (Traction Distribution) into a single 4.0h window, saving multiple traffic halts."
+    }
+  ]
+}

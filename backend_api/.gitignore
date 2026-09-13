@@ -1,0 +1,6 @@
+
+# SQLite database - rebuild from schema.sql instead of committing binary db
+db/railway.db
+
+# OS junk
+.DS_Store

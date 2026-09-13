@@ -1,0 +1,3 @@
+task_id,corridor_id,track_segment,start_time,end_time,priority_rank,work_type,horizon,validated_at
+TASK_W01,CORRIDOR_NORTH,SEG_01,2026-08-28 08:00,2026-08-28 10:00,1,Track Replacement,weekly_tactical,2026-09-01 03:22:49
+TASK_W02,CORRIDOR_NORTH,SEG_01,2026-08-28 10:30,2026-08-28 12:30,2,Overhead Line Inspection,weekly_tactical,2026-09-01 03:22:49
