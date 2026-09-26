@@ -15,10 +15,17 @@ Transformations (each verified against ml_training_dataset.csv):
 
 Safe to re-run: only processes raw rows whose record_id isn't already
 in defect_records.
+
+Skipped records (unknown corridor or severity) raise a RECORD_SKIPPED
+notification, so they don't just vanish from the plan.
 """
 
 import sqlite3
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "api"))
+from query_api import notify
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "db", "railway.db")
 
@@ -47,9 +54,10 @@ def get_corridor_traffic_density(conn, corridor_id):
 
 
 def normalize(conn):
+    """Returns the skipped records as (record_id, department, corridor_id, severity_class) tuples."""
     raw_records = get_unnormalized_raw_records(conn)
     normalized_count = 0
-    skipped_count = 0
+    skipped = []
     cur = conn.cursor()
 
     for (raw_id, department, source_record_id, corridor_id, zone, defect_type,
@@ -61,7 +69,7 @@ def normalize(conn):
         if severity_score is None or corridor_traffic_density is None:
             print(f"[normalizer] WARNING: incomplete data for record_id={source_record_id} "
                   f"(severity_class={severity_class}, corridor_id={corridor_id}) — skipping")
-            skipped_count += 1
+            skipped.append((source_record_id, department, corridor_id, severity_class))
             continue
 
         cur.execute(
@@ -81,13 +89,22 @@ def normalize(conn):
         normalized_count += 1
 
     conn.commit()
-    print(f"[normalizer] Normalized {normalized_count} records, skipped {skipped_count}.")
+    print(f"[normalizer] Normalized {normalized_count} records, skipped {len(skipped)}.")
+    return skipped
 
 
 def run(db_path=DB_PATH):
     conn = sqlite3.connect(db_path)
-    normalize(conn)
+    skipped = normalize(conn)
     conn.close()
+    notify([{
+        "event_type": "RECORD_SKIPPED", "severity": "MODERATE", "recipient": "Controller",
+        "ref_id": record_id, "corridor_id": corridor_id,
+        "title": f"{record_id} left out of planning",
+        "message": f"{department} record {record_id} has corridor_id={corridor_id} and "
+                   f"severity_class={severity_class}; one of them isn't recognised, so it "
+                   f"wasn't normalized and won't be scored or scheduled.",
+    } for record_id, department, corridor_id, severity_class in skipped], db_path=db_path)
 
 
 if __name__ == "__main__":

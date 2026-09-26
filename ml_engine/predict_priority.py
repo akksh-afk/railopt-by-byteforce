@@ -118,7 +118,7 @@ SAFETY_BONUS = {"A": 15, "B": 5, "C": 0}
 # notification (CONTRACTS.md Interface 7). It's on the probability, not on
 # final_priority_score, because the score is capped at 100 and ~9% of the
 # 11,500 records hit that cap -- a score threshold can't pick out the top few.
-# 0.995 flags ~2.6% of the current data (298 records).
+# 0.995 flags ~2.7% of the current data (310 of 11,500 records).
 ALERT_MIN_PROBABILITY = 0.995
 
 
