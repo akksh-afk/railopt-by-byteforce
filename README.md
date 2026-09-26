@@ -91,10 +91,11 @@ For the current status of every layer and what's planned next, see
 [ROADMAP.md](ROADMAP.md).
 
 ## Who is the reader / team structure
-- Person 1: ML model + overall data schema/contracts
+- Person 1: ML model + Optimizer (OR-Tools scheduler) + What-If Simulation
+  Sandbox, and the overall data schema/contracts
 - Person 2: Backend/database + data connectors
-- Person 3: Optimizer (OR-Tools scheduler) + Validation & Safety Rule Engine
-- Person 4: Dashboard/frontend + What-If Simulation Sandbox
+- Person 3: Validation & Safety Rule Engine + weekly/monthly plans
+- Person 4: Dashboard/frontend
 
 Full ownership (layers, folders, interfaces) is in
 [CONTRACTS.md](CONTRACTS.md#who-owns-what).

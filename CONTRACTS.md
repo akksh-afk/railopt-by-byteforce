@@ -18,16 +18,20 @@ which one is right and what's still open.
 
 | Person | Role | Layers | Folders | Produces | Consumes |
 |---|---|---|---|---|---|
-| **Person 1** | ML model + data schema/contracts | 4 (plus the real/synthetic data and this file) | `ml_engine/`, `data/`, `CONTRACTS.md` | Interfaces 1, 2, 3; defines the Interface 7 events | Interface 1 (from Person 2's database) |
+| **Person 1** | ML model + optimizer + what-if sandbox, and the data schema/contracts | 4, 5, 6, 10 (plus the real/synthetic data and this file) | `ml_engine/`, `optimizer_engine/`, `simulation_sandbox/`, `data/`, `CONTRACTS.md` | Interfaces 1, 4; Interfaces 2 and 3 are internal; defines the Interface 7 events | Interface 1 (from Person 2's database), Interfaces 5 and 6 (for the sandbox) |
 | **Person 2** | Backend/database + data connectors | 1, 2, 3 + notification delivery | `backend_api/` | Interface 1 (`get_pending_defects()`), Interface 7 (storage + export) | Data files (Person 1), validation reports (Person 3) |
-| **Person 3** | Optimization + safety validation | 5, 6, 7, 8 | `optimizer_engine/`, `validation_engine/` | Interface 4 (internal: optimizer → validator), Interface 5 | Interfaces 2, 3 |
-| **Person 4** | Dashboard + what-if sandbox | 9, 10 | `dashboard/`, `simulation_sandbox/` | What the Controller sees and does | Interfaces 5, 6, 7 |
+| **Person 3** | Safety validation + weekly/monthly plans | 7, 8 | `validation_engine/` | Interfaces 5, 6 | Interface 4 (from Person 1's optimizer) |
+| **Person 4** | Dashboard | 9 | `dashboard/` | What the Controller sees and does | Interfaces 5, 7 |
 
-This replaces the earlier six-person split. The old Persons 3 and 4
-(optimizer, validator) are now **Person 3**, so the optimizer → validator
-handoff (Interface 4) has one owner. The old Persons 5 and 6 (dashboard,
-sandbox) are now **Person 4**. Older notes such as
-`simulation_sandbox/PERSON6_NOTES.md` still use the old numbers.
+Person 1 owns the whole chain from a pending defect to a draft schedule:
+scoring, free windows, optimizer. So Interfaces 2 and 3 are internal, and
+the first hand-off to another person is the draft schedule going to Person 3
+for validation (Interface 4). Person 1 also owns the sandbox, which takes the
+validated schedule back from Person 3 (Interface 6).
+
+**This table is the authority on ownership.** Code comments and older notes
+(e.g. `simulation_sandbox/PERSON6_NOTES.md`, `safety_engine.py`) still use
+the earlier six-person numbers.
 
 ---
 
@@ -60,11 +64,11 @@ draft: if the draft is rejected, they'd drop out of planning for good.
 
 ---
 
-## INTERFACE 2 — ML Priority Engine → Optimizer (Person 1 → Person 3)
-**Status: DONE on Person 1's side (`ml_engine/predict_priority.py`). Person 3
+## INTERFACE 2 — ML Priority Engine → Optimizer (Person 1, internal)
+**Status: DONE on the ML side (`ml_engine/predict_priority.py`). The optimizer
 still reads a CSV instead (see Open items).**
 
-The call Person 3 should make is one line, on the whole list:
+The call the optimizer should make is one line, on the whole list:
 ```python
 ranked = score_all_pending_tasks(get_pending_defects())
 ```
@@ -103,7 +107,7 @@ seen in training. The record is still scored, using a fallback category, and
 
 ---
 
-## INTERFACE 3 — Corridor Availability → Optimizer (Person 1 → Person 3)
+## INTERFACE 3 — Corridor Availability → Optimizer (Person 1, internal)
 **Status: DONE. File: `data/derived/corridor_free_windows.csv`**
 
 | column | type | example |
@@ -125,7 +129,7 @@ added).
 
 ---
 
-## INTERFACE 4 — Optimizer → Validation Engine (Person 3, internal)
+## INTERFACE 4 — Optimizer → Validation Engine (Person 1 → Person 3)
 **Status: BOTH SIDES EXIST, BUT DON'T MATCH YET (see Open items).**
 
 **What the optimizer writes** (`optimizer_engine/output/draft_schedule.json`,
@@ -178,13 +182,13 @@ task**, not per block:
 | requires_power_cutoff | no | `True` |
 
 The fix is an adapter that turns each block into one row per entry in
-`tasks`, all with the block's times. Both sides belong to Person 3, so the
-adapter does too.
+`tasks`, all with the block's times. The validator's input is the settled
+side (it's done and tested), so Person 1 adapts the optimizer's output to it.
 
 ---
 
 ## INTERFACE 5 — Validation Engine → Dashboard + Simulation Sandbox
-**(Person 3 → Person 4)**
+**(Person 3 → Person 4 for the dashboard, Person 3 → Person 1 for the sandbox)**
 **Status: DONE. This is the actual return value of `run_validation()`.**
 
 ```json
@@ -204,7 +208,7 @@ adapter does too.
 `rule_code` is one of `ERR_TRACK_OVERLAP`, `ERR_TRAIN_HEADWAY_VIOLATION`,
 `ERR_POWER_ZONE_CONFLICT`. The report doesn't include the schedule, so pass
 both along. On `FAIL`, `multi_horizon.generate_cuts_for_solver(violations)`
-turns violations into cuts for Person 3's retry.
+turns violations into cuts for the optimizer's retry (Person 1).
 
 After every validation, PASS or FAIL, call
 `on_schedule_approved(report, schedule)` from `backend_api/api/query_api.py`
@@ -212,8 +216,8 @@ After every validation, PASS or FAIL, call
 
 ---
 
-## INTERFACE 6 — Approved Schedule → What-If Sandbox (Person 3 → Person 4)
-Person 4's sandbox takes a **copy** of the approved schedule (Interface 5 output,
+## INTERFACE 6 — Approved Schedule → What-If Sandbox (Person 3 → Person 1)
+Person 1's sandbox takes a **copy** of the approved schedule (Interface 5 output,
 `status: PASS`), lets the user modify `start_time`/`end_time` of one block,
 then re-runs Interface 4 + 5 logic (lightweight) on just that change —
 without writing back to the real approved schedule.
@@ -263,19 +267,20 @@ same `event_type` + reference + recipient is recorded only once.
 ---
 
 ## Open items
-1. **Person 3:** the optimizer reads `data/synthetic/defects_SCORED.csv`, which
+1. **Person 1:** the optimizer reads `data/synthetic/defects_SCORED.csv`, which
    has 15 hand-made rows with corridor IDs like `COR-01` that don't exist in
    `corridor_master` (so it falls back to default windows), and zones and
    defect types the model never saw (so all 15 scores are fallback guesses,
    flagged `needs_review`). Switch the loader
    to `score_all_pending_tasks(get_pending_defects())`. That's 11,500 real
    records, so rank and cap them first, e.g. top N per planning horizon.
-2. **Person 3:** the Interface 4 adapter (blocks → one row per task).
-3. **Person 3:** in the optimizer's blocks, fix `from_station`/`to_station`
+2. **Person 1:** the Interface 4 adapter (blocks → one row per task).
+3. **Person 1:** in the optimizer's blocks, fix `from_station`/`to_station`
    (look them up in `corridor_master`), roll the date forward when a block
    crosses midnight, add `block_type`, and set `status` to `DRAFT`.
 4. **Person 3:** call `on_schedule_approved(report, schedule)` after each
    validation in `multi_horizon.py`, for PASS and for FAIL.
 5. **Person 4:** show the validated weekly/monthly plan in the dashboard
-   instead of mock schedule data, and swap the sandbox's own rule check for
-   the Layer 7 engine (the seam is marked in `what_if_sandbox.py`).
+   instead of mock schedule data.
+6. **Person 1:** swap the sandbox's own rule check for Person 3's Layer 7
+   engine (the seam is marked in `what_if_sandbox.py`).
