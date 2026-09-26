@@ -151,7 +151,7 @@ until there is a server (see ROADMAP.md).
 
 ## Open items
 
-- `on_schedule_approved()` isn't called by anyone yet — Person 4's
+- `on_schedule_approved()` isn't called by anyone yet — Person 3's
   `multi_horizon.py` is the natural caller (on PASS and on FAIL).
 - The optimizer still reads `data/synthetic/defects_SCORED.csv` instead
   of `get_pending_defects()` + `score_all_pending_tasks()` — see

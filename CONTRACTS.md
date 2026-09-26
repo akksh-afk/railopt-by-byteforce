@@ -7,10 +7,27 @@ integration will break — so if you need to deviate, raise it with the team
 before changing anything, don't just change it silently in your own folder.
 
 Every interface below is based on code that is ALREADY BUILT AND WORKING
-(Layers 1-5, ML model, and Person 4's validator) — this isn't a plan, it's
+(Layers 1-5, ML model, and the validator) — this isn't a plan, it's
 documentation of what already exists plus what still needs to be built to
 match it. Where the code and this file disagreed, the section below says
 which one is right and what's still open.
+
+---
+
+## Who owns what
+
+| Person | Role | Layers | Folders | Produces | Consumes |
+|---|---|---|---|---|---|
+| **Person 1** | ML model + data schema/contracts | 4 (plus the real/synthetic data and this file) | `ml_engine/`, `data/`, `CONTRACTS.md` | Interfaces 1, 2, 3; defines the Interface 7 events | Interface 1 (from Person 2's database) |
+| **Person 2** | Backend/database + data connectors | 1, 2, 3 + notification delivery | `backend_api/` | Interface 1 (`get_pending_defects()`), Interface 7 (storage + export) | Data files (Person 1), validation reports (Person 3) |
+| **Person 3** | Optimization + safety validation | 5, 6, 7, 8 | `optimizer_engine/`, `validation_engine/` | Interface 4 (internal: optimizer → validator), Interface 5 | Interfaces 2, 3 |
+| **Person 4** | Dashboard + what-if sandbox | 9, 10 | `dashboard/`, `simulation_sandbox/` | What the Controller sees and does | Interfaces 5, 6, 7 |
+
+This replaces the earlier six-person split. The old Persons 3 and 4
+(optimizer, validator) are now **Person 3**, so the optimizer → validator
+handoff (Interface 4) has one owner. The old Persons 5 and 6 (dashboard,
+sandbox) are now **Person 4**. Older notes such as
+`simulation_sandbox/PERSON6_NOTES.md` still use the old numbers.
 
 ---
 
@@ -108,7 +125,7 @@ added).
 
 ---
 
-## INTERFACE 4 — Optimizer → Validation Engine (Person 3 → Person 4)
+## INTERFACE 4 — Optimizer → Validation Engine (Person 3, internal)
 **Status: BOTH SIDES EXIST, BUT DON'T MATCH YET (see Open items).**
 
 **What the optimizer writes** (`optimizer_engine/output/draft_schedule.json`,
@@ -161,13 +178,13 @@ task**, not per block:
 | requires_power_cutoff | no | `True` |
 
 The fix is an adapter that turns each block into one row per entry in
-`tasks`, all with the block's times. Person 3 and Person 4 need to agree who
-owns it.
+`tasks`, all with the block's times. Both sides belong to Person 3, so the
+adapter does too.
 
 ---
 
 ## INTERFACE 5 — Validation Engine → Dashboard + Simulation Sandbox
-**(Person 4 → Person 5, Person 4 → Person 6)**
+**(Person 3 → Person 4)**
 **Status: DONE. This is the actual return value of `run_validation()`.**
 
 ```json
@@ -195,8 +212,8 @@ After every validation, PASS or FAIL, call
 
 ---
 
-## INTERFACE 6 — Approved Schedule → What-If Sandbox (Person 4 → Person 6)
-Person 6 takes a **copy** of the approved schedule (Interface 5 output,
+## INTERFACE 6 — Approved Schedule → What-If Sandbox (Person 3 → Person 4)
+Person 4's sandbox takes a **copy** of the approved schedule (Interface 5 output,
 `status: PASS`), lets the user modify `start_time`/`end_time` of one block,
 then re-runs Interface 4 + 5 logic (lightweight) on just that change —
 without writing back to the real approved schedule.
@@ -253,9 +270,12 @@ same `event_type` + reference + recipient is recorded only once.
    flagged `needs_review`). Switch the loader
    to `score_all_pending_tasks(get_pending_defects())`. That's 11,500 real
    records, so rank and cap them first, e.g. top N per planning horizon.
-2. **Person 3 + Person 4:** the Interface 4 adapter (blocks → one row per task).
+2. **Person 3:** the Interface 4 adapter (blocks → one row per task).
 3. **Person 3:** in the optimizer's blocks, fix `from_station`/`to_station`
    (look them up in `corridor_master`), roll the date forward when a block
    crosses midnight, add `block_type`, and set `status` to `DRAFT`.
-4. **Person 4:** call `on_schedule_approved(report, schedule)` after each
+4. **Person 3:** call `on_schedule_approved(report, schedule)` after each
    validation in `multi_horizon.py`, for PASS and for FAIL.
+5. **Person 4:** show the validated weekly/monthly plan in the dashboard
+   instead of mock schedule data, and swap the sandbox's own rule check for
+   the Layer 7 engine (the seam is marked in `what_if_sandbox.py`).
