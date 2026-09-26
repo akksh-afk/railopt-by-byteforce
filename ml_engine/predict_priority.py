@@ -200,7 +200,7 @@ def score_record(record: dict) -> dict:
 
 def score_all_pending_tasks(defect_records: list) -> list:
     """
-    THIS is the function Person 3 (optimizer) actually calls.
+    THIS is the function the optimizer (Layer 6) actually calls.
 
     Takes a LIST of defect records (e.g. straight from Person 2's
     get_pending_defects() database function -- hundreds of real rows,
@@ -229,7 +229,7 @@ def score_all_pending_tasks(defect_records: list) -> list:
     X_all, unseen = _encode(defect_records)
     probas = model.predict_proba(X_all)[:, 1]
     # merge the original record's fields with the new score fields
-    # into ONE dictionary, so nothing is lost -- Person 3 gets both
+    # into ONE dictionary, so nothing is lost -- the optimizer gets both
     # the original defect info AND the priority score together.
     scored_list = [{**record, **_score_fields(record, float(p), u)}
                    for record, p, u in zip(defect_records, probas, unseen)]

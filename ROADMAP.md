@@ -19,12 +19,12 @@ not a missing feature.
 | 2 | Unified database | Person 2 | **Done** (SQLite) |
 | 3 | Normalization | Person 2 | **Done** |
 | 4 | ML priority engine | Person 1 | **Done** |
-| 5 | Corridor capacity engine | Person 3 | **Done** · falls back to made-up windows for unknown corridors |
-| 6 | Constraint optimizer (OR-Tools) | Person 3 | **Works on demo data** · not yet fed from the database |
+| 5 | Corridor capacity engine | Person 1 | **Done** · falls back to made-up windows for unknown corridors |
+| 6 | Constraint optimizer (OR-Tools) | Person 1 | **Works on demo data** · not yet fed from the database |
 | 7 | Safety rule engine | Person 3 | **Done** · input shape doesn't match the optimizer's output yet |
 | 8 | Weekly + monthly plans | Person 3 | **Works on sample data** |
 | 9 | Controller dashboard | Person 4 | **Built** · corridors and alerts are real, the rest is mock data |
-| 10 | What-if sandbox | Person 4 | **Done** as a standalone demo |
+| 10 | What-if sandbox | Person 1 | **Done** as a standalone demo |
 | — | Notifications | Person 1 + 2 | **Done** for the backend and the dashboard feed |
 
 The one gap that matters most: **the layers work, but they aren't one
@@ -140,13 +140,13 @@ dashboard. Everything here is small; the risk is in not doing it.
 
 | Task | Owner | Notes |
 |---|---|---|
-| Feed the optimizer from the database: `score_all_pending_tasks(get_pending_defects())` | Person 3 | Take the top N ranked tasks per horizon. All 11,500 would mean thousands of corridor solves. The capacity engine re-reads a 273k-row CSV for every corridor, so load it once into a dict first. |
-| Fix block fields: real station names, date rollover past midnight, `block_type`, `status: DRAFT` | Person 3 | CONTRACTS.md Interface 4 |
-| Adapter from blocks to one row per task for the validator | Person 3 | Both sides of Interface 4 are now Person 3's |
+| Feed the optimizer from the database: `score_all_pending_tasks(get_pending_defects())` | Person 1 | Take the top N ranked tasks per horizon. All 11,500 would mean thousands of corridor solves. The capacity engine re-reads a 273k-row CSV for every corridor, so load it once into a dict first. |
+| Fix block fields: real station names, date rollover past midnight, `block_type`, `status: DRAFT` | Person 1 | CONTRACTS.md Interface 4 |
+| Adapter from blocks to one row per task for the validator | Person 1 | The validator's input is settled, so the optimizer's output adapts to it |
 | Call `on_schedule_approved(report, schedule)` after every validation | Person 3 | Turns on the block-assigned and validation-failed alerts, and marks defects scheduled only on PASS |
 | Show the validated weekly/monthly plan instead of mock schedule data | Person 4 | Read the Layer 8 CSVs, or a JSON export of them |
-| Plug the Layer 7 engine into the what-if sandbox | Person 4 | Replaces the sandbox's own rule subset; the seam is marked in `what_if_sandbox.py` |
-| Say when default windows are used instead of real ones | Person 3 | A `source: "default"` field on the window is enough |
+| Plug the Layer 7 engine into the what-if sandbox | Person 1 | Replaces the sandbox's own rule subset; the seam is marked in `what_if_sandbox.py` |
+| Say when default windows are used instead of real ones | Person 1 | A `source: "default"` field on the window is enough |
 | COA connector: load `synthetic_COA_block_demands.csv` (4,600 block requests) | Person 2 | This is the "departments request blocks independently" half of the problem. It's also the input for Phase 2 |
 
 **Done when:** one command takes the 11,500 defects to a weekly plan that

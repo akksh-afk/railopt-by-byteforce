@@ -2,7 +2,7 @@
 Query API
 ---------
 This is what Interface 1/2 in CONTRACTS.md means by "how the database
-will expose data" — Person 3 (or anyone else) should call these
+will expose data" — the optimizer (or anyone else) should call these
 functions instead of writing SQL against defect_records directly.
 
 Resolves CONTRACTS.md Open Item #3:
@@ -10,7 +10,7 @@ Resolves CONTRACTS.md Open Item #3:
     data — i.e., what function/query other layers call to get
     pending defect records (rather than reading CSVs directly)."
 
-Usage (from Person 3's code):
+Usage (from the optimizer's code):
     from api.query_api import get_pending_defects
     from predict_priority import score_all_pending_tasks
     # field names match CONTRACTS.md Interface 1 exactly, so the list goes
