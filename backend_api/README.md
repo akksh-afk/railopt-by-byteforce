@@ -2,6 +2,8 @@
 
 **Owner: Person 2 (Backend/database + data connectors) — RailOpt / SIH26027**
 
+New to this code? Start with [ONBOARDING.md](ONBOARDING.md) (every command, and how it works inside). Next tasks, demo script and judge Q&A: [PERSON2_NOTES.md](PERSON2_NOTES.md). Where the backend is heading, stage by stage: [ROADMAP.md](ROADMAP.md).
+
 ## What this does
 
 Three departments — Engineering (TMS), Signal & Telecommunication
