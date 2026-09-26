@@ -217,48 +217,79 @@ h1, h2, h3, .brand-font {
   gap: 8px;
 }
 
+/* Summary cards (home): compact, tappable, English + Hindi */
+.summary { display: flex; flex-direction: column; gap: 10px; }
+
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
 }
 
 .metric-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  gap: 2px;
+  text-align: left;
+  font: inherit;
+  color: var(--text-main);
+  cursor: pointer;
+  min-height: 48px;
 }
 
-.metric-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-}
+.metric-card:hover { border-color: var(--accent); background: var(--bg-hover); }
+.metric-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.metric-card[aria-expanded="true"] { border-color: var(--accent); background: var(--bg-hover); }
 
 .metric-title {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.metric-value {
-  font-size: 26px;
-  font-weight: 700;
-  font-family: 'Rajdhani', sans-serif;
-  color: var(--text-main);
-}
-
-.metric-footer {
-  font-size: 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.metric-chevron { margin-left: auto; color: var(--text-dim); }
+.metric-card[aria-expanded="true"] .metric-chevron { transform: rotate(180deg); color: var(--accent); }
+
+.metric-hi { font-size: 12px; font-weight: 500; color: var(--text-dim); white-space: nowrap; }
+
+.metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+.metric-value small { font-size: 14px; }
+
+.metric-footer { font-size: 12px; color: var(--text-muted); }
+
+.metric-detail {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+.metric-detail > div { flex: 1; }
+.metric-detail p { margin: 0; font-size: 14px; line-height: 1.5; }
+.metric-detail .metric-detail-hi { margin-top: 6px; color: var(--text-muted); }
+.metric-go { flex: none; min-height: 44px; text-align: left; }
+.metric-go small { display: block; font-size: 11px; font-weight: 500; opacity: 0.85; }
+
+.metric-hint { margin: 0; font-size: 12px; color: var(--text-dim); }
+
+@media (max-width: 640px) {
+  .metric-detail { flex-direction: column; align-items: stretch; }
 }
 
 /* Department Badges */
