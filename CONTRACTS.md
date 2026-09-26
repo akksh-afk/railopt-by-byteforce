@@ -248,7 +248,9 @@ same `event_type` + reference + recipient is recorded only once.
 ## Open items
 1. **Person 3:** the optimizer reads `data/synthetic/defects_SCORED.csv`, which
    has 15 hand-made rows with corridor IDs like `COR-01` that don't exist in
-   `corridor_master` (so it falls back to default windows). Switch the loader
+   `corridor_master` (so it falls back to default windows), and zones and
+   defect types the model never saw (so all 15 scores are fallback guesses,
+   flagged `needs_review`). Switch the loader
    to `score_all_pending_tasks(get_pending_defects())`. That's 11,500 real
    records, so rank and cap them first, e.g. top N per planning horizon.
 2. **Person 3 + Person 4:** the Interface 4 adapter (blocks → one row per task).
