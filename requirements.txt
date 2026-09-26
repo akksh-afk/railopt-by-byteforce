@@ -1,0 +1,10 @@
+# xgboost and scikit-learn must match the versions ml_engine/models/ was
+# trained with: the model file and the pickled label encoders are read back
+# with these exact versions. The rest are the versions the pipeline was
+# last tested with.
+xgboost==3.2.0
+scikit-learn==1.9.0
+numpy==2.5.3
+pandas==3.0.6
+ortools==9.15.6755
+matplotlib  # training chart only

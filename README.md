@@ -74,13 +74,21 @@ We built a 10-layer pipeline:
 - Synthetic TMS/SMMS/TDMS/COA datasets generated, calibrated to real
   government audit statistics — DONE
 - ML Priority Model (Layer 4) trained on 11,500 records: XGBoost
-  classifier, 94.8% accuracy, 96.8% recall (deliberately optimized for
-  recall over raw accuracy, since missing a real safety defect is worse
-  than a false alarm), 0.987 ROC-AUC — DONE, fully reproducible script
+  classifier, 94.6% accuracy, 95.9% recall, 64.4% precision, 0.986 ROC-AUC
+  on 2,300 held-out records (deliberately optimized for recall over
+  precision, since missing a real safety defect is worse than a false
+  alarm) — DONE, fully reproducible script (retraining reproduces
+  `ml_engine/models/` byte-for-byte; numbers from
+  `ml_engine/models/evaluation_report.txt`)
+- Backend pipeline (Layers 1-3) + notifications: ingest, normalize,
+  score, and raise alerts for the dashboard — DONE (`backend_api/`)
 - Validation & Safety Rule Engine (Layer 7) — DONE (built by teammate)
 - Optimizer (Layer 6, OR-Tools) — IN PROGRESS
 - Dashboard (Layer 9) — IN PROGRESS
 - What-If Simulation Sandbox (Layer 10) — NOT STARTED, this is your task
+
+For the current status of every layer and what's planned next, see
+[ROADMAP.md](ROADMAP.md).
 
 ## Who is the reader / team structure
 - Person 1: ML model + overall data schema/contracts

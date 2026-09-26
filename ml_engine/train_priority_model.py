@@ -16,8 +16,8 @@ established best-performing, most interpretable choice for this category of
 problem, and train in seconds on a laptop CPU — no GPU required.
 
 HOW TO RUN:
-    pip install xgboost scikit-learn pandas matplotlib shap --break-system-packages
-    python3 train_priority_model.py
+    pip install -r requirements.txt        (from the repo root)
+    python3 train_priority_model.py ml_training_dataset.csv
 
 OUTPUT:
     - models/priority_model.json          (the trained model, reload anytime)
@@ -38,19 +38,21 @@ from sklearn.metrics import (
 import matplotlib.pyplot as plt
 import pickle
 import os
+import sys
 
 from pathlib import Path
 
-# Project root = RailOpt-SIH26027
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# Paths are relative to this file, so it works wherever the repo is cloned.
+SCRIPT_DIR = Path(__file__).resolve().parent
 
-DATA_DIR = r"C:\sih\RailOpt-SIH26027\data\synthetic"
+DATA_DIR = SCRIPT_DIR.parent / "data" / "synthetic"
 
-filename = input("Enter the dataset filename (e.g. SyntheticDataSet.csv): ").strip()
+filename = (sys.argv[1] if len(sys.argv) > 1
+            else input("Enter the dataset filename [ml_training_dataset.csv]: ").strip()) or "ml_training_dataset.csv"
 
 DATA_PATH = os.path.join(DATA_DIR, filename)
 
-MODEL_DIR = PROJECT_ROOT / "RailOpt-SIH26027" / "ml_engine" / "models"
+MODEL_DIR = SCRIPT_DIR / "models"
 
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
