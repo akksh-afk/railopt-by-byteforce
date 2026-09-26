@@ -72,20 +72,20 @@ export default function Alerts({ alerts = [] }) {
         marginBottom: 16
       }}>
         <div style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '10px 14px', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, color: '#fb7185' }}>CRITICAL ALERTS (HEADWAY/OVERLAP)</div>
-          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.filter(a => a.severity === 'CRITICAL').length} Prevented</b>
+          <div style={{ fontSize: 11, color: '#fb7185' }}>CRITICAL</div>
+          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.filter(a => a.severity === 'CRITICAL').length} alerts</b>
         </div>
         <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '10px 14px', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, color: '#fcd34d' }}>HIGH (TRACTION & POWER ZONES)</div>
-          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.filter(a => a.severity === 'HIGH').length} Isolated</b>
+          <div style={{ fontSize: 11, color: '#fcd34d' }}>HIGH</div>
+          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.filter(a => a.severity === 'HIGH').length} alerts</b>
         </div>
         <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '10px 14px', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, color: '#93c5fd' }}>CAG MAINTENANCE BACKLOG</div>
-          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.filter(a => a.severity === 'MODERATE').length} Scheduled</b>
+          <div style={{ fontSize: 11, color: '#93c5fd' }}>MODERATE</div>
+          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.filter(a => a.severity === 'MODERATE').length} alerts</b>
         </div>
         <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '10px 14px', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, color: '#6ee7b7' }}>AUTOMATIC ACTION RATE</div>
-          <b style={{ fontSize: 18, color: '#fff' }}>100% Resolved by Solver</b>
+          <div style={{ fontSize: 11, color: '#6ee7b7' }}>IN THIS FEED</div>
+          <b style={{ fontSize: 18, color: '#fff' }}>{alerts.length} total</b>
         </div>
       </div>
 
