@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RailOpt Control Desk</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Icons, drawn once and reused. Every top-bar icon renders at 50px. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-train" viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2zM4 11h16M8 18l-2 3M16 18l2 3"/><circle cx="8.5" cy="14.5" r="1"/><circle cx="15.5" cy="14.5" r="1"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 10h16M8 3v4M16 3v4"/></symbol>
+      <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true"><svg><use href="#i-train"/></svg></span>
+      <span><b>RailOpt</b> Control Desk</span>
+    </div>
+
+    <nav class="nav" aria-label="Pages">
+      <a class="icon-btn" href="#home" data-page="home" title="Home"><svg aria-hidden="true"><use href="#i-home"/></svg><span class="sr">Home</span></a>
+      <a class="icon-btn" href="#alerts" data-page="alerts" title="Alerts"><svg aria-hidden="true"><use href="#i-bell"/></svg><span class="sr">Alerts</span><span class="badge" id="alert-badge"></span></a>
+      <a class="icon-btn" href="#closures" data-page="closures" title="Closures"><svg aria-hidden="true"><use href="#i-cal"/></svg><span class="sr">Closures</span></a>
+      <a class="icon-btn" href="#settings" data-page="settings" title="Settings"><svg aria-hidden="true"><use href="#i-gear"/></svg><span class="sr">Settings</span></a>
+    </nav>
+
+    <div class="status">
+      <span class="clock" id="clock"></span>
+      <label class="sr" for="zone">Zone</label>
+      <select id="zone" class="zone"></select>
+      <button class="icon-btn" id="me" title="Me: shift handover (H)"><svg aria-hidden="true"><use href="#i-user"/></svg><span class="sr">Shift handover</span></button>
+    </div>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <p class="foot" id="foot"></p>
+
+  <dialog id="dialog" aria-labelledby="dialog-title">
+    <h2 id="dialog-title"></h2>
+    <div id="dialog-body"></div>
+    <div class="dialog-actions" id="dialog-actions"></div>
+  </dialog>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
