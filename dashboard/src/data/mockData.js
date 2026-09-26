@@ -5,7 +5,7 @@ export const mockSummary = {
   mergeEfficiency: '3.2 : 1',
   downtimeSavedMin: 4820,
   assetAvailabilityPct: 96.8,
-  safetyRecallPct: 96.8,
+  safetyRecallPct: 95.9,   // recall on 2,300 held-out records, ml_engine/models/evaluation_report.txt
   criticalClassACleared: 98.4
 };
 

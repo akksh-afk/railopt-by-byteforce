@@ -91,6 +91,7 @@ export default function App() {
                 summary={summary} 
                 activeZone={activeZone} 
                 totalCorridorsCount={zoneCorridorsCount} 
+                onNavigate={setView}
               />
               <JourneyHero />
               <CorridorMap 
