@@ -89,6 +89,8 @@ We built a 10-layer pipeline:
 
 For the current status of every layer and what's planned next, see
 [ROADMAP.md](ROADMAP.md).
+How the stages run one after another, and where that flow is still
+broken: [EXECUTION_FLOW.md](EXECUTION_FLOW.md).
 
 ## Who is the reader / team structure
 - Person 1: ML model + Optimizer (OR-Tools scheduler) + What-If Simulation
