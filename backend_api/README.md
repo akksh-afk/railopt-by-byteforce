@@ -2,6 +2,8 @@
 
 **Owner: Person 2 (Backend/database + data connectors) — RailOpt / SIH26027**
 
+Next tasks, demo script and judge Q&A: [PERSON2_NOTES.md](PERSON2_NOTES.md).
+
 ## What this does
 
 Three departments — Engineering (TMS), Signal & Telecommunication
