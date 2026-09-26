@@ -13,7 +13,17 @@ export const getSummary = async () => mockSummary;
 export const getCorridors = async () => allCorridors;
 export const getStations = async () => mockStations;
 export const getSchedule = async () => mockSchedule;
-export const getAlerts = async () => mockAlerts;
+// Real alerts are exported by backend_api/run_pipeline.py into
+// public/notifications.json. Falls back to the mock feed if it isn't there.
+export const getAlerts = async () => {
+  try {
+    const res = await fetch(`${import.meta.env.BASE_URL}notifications.json`);
+    if (res.ok) return await res.json();
+  } catch {
+    // no file yet: use the mock feed
+  }
+  return mockAlerts;
+};
 export const getDecisionTrace = async () => mockDecisionTrace;
 
 // Corridor train timetables & power zone timetable profiles (24-Hour Timetable Grid)

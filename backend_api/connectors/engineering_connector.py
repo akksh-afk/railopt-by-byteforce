@@ -36,11 +36,13 @@ def load_records(csv_path=CSV_PATH):
 
 
 def insert_records(records, conn):
+    """Returns how many records were new (already-ingested ones are skipped)."""
+    before = conn.total_changes
     cur = conn.cursor()
     for r in records:
         cur.execute(
             """
-            INSERT INTO raw_defect_ingest
+            INSERT OR IGNORE INTO raw_defect_ingest
                 (department, source_record_id, corridor_id, zone, defect_type, severity_class,
                  days_overdue, estimated_repair_duration_hrs, requires_block, raw_payload)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -59,14 +61,14 @@ def insert_records(records, conn):
             ),
         )
     conn.commit()
-    return cur.rowcount
+    return conn.total_changes - before
 
 
 def run(csv_path=CSV_PATH, db_path=DB_PATH):
     conn = sqlite3.connect(db_path)
     records = load_records(csv_path)
-    insert_records(records, conn)
-    print(f"[Engineering connector] Loaded {len(records)} records from {os.path.basename(csv_path)}.")
+    added = insert_records(records, conn)
+    print(f"[Engineering connector] Loaded {added} new of {len(records)} records from {os.path.basename(csv_path)}.")
     conn.close()
 
 

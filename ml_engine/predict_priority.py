@@ -33,22 +33,21 @@ import os
 import sys
 
 # This makes the script work correctly no matter which folder you're
-# standing in when you run it (important since Person 2 is on Arch
-# Linux and you're on Windows -- file path handling differs between
-# operating systems, and this line avoids that becoming a problem).
+# standing in when you run it, and no matter where the repo was cloned
+# (Person 2 is on Arch Linux, you're on Windows).
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(SCRIPT_DIR, "models")
 
 
-PROJECT_ROOT = r"C:\sih\RailOpt-SIH26027"
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 RAW_DATA_DIR = os.path.join(DATA_DIR, "raw")
 SYNTHETIC_DATA_DIR = os.path.join(DATA_DIR, "synthetic")
 
-def find_prediction_csv():
-    if len(sys.argv) > 1:
-        filename = sys.argv[1].strip()
+def find_prediction_csv(filename=None):
+    if filename:
+        filename = filename.strip()
     else:
         filename = input("Enter the CSV filename to score: ").strip()
 
@@ -115,54 +114,89 @@ CATEGORICAL_COLS = ["department", "zone", "defect_type", "severity_class",
 # authority."
 SAFETY_BONUS = {"A": 15, "B": 5, "C": 0}
 
-def score_record(record: dict) -> dict:
+# Defects at or above this failure probability raise a HIGH_PRIORITY_DEFECT
+# notification (CONTRACTS.md Interface 7). It's on the probability, not on
+# final_priority_score, because the score is capped at 100 and ~9% of the
+# 11,500 records hit that cap -- a score threshold can't pick out the top few.
+# 0.995 flags ~2.7% of the current data (310 of 11,500 records).
+ALERT_MIN_PROBABILITY = 0.995
+
+
+def _as_bool_str(value):
     """
-    record: dict with keys matching FEATURE_COLS (raw, human-readable values)
-    returns: dict with ml_probability, priority_score (0-100), and explanation
+    The encoder was fit on the strings "True"/"False". Map the usual spellings
+    (True, "true", 1, "1", "yes", ...) onto those, so a record that needs a block
+    is never read as "False". Anything else is left as-is and gets flagged as
+    unseen by _encode().
     """
+    text = str(value).strip().lower()
+    if text in ("true", "1", "yes"):
+        return "True"
+    if text in ("false", "0", "no"):
+        return "False"
+    return str(value)
+
+
+def _encode(records):
+    """Turns raw records into the model's feature matrix, plus a list of unseen categories per record."""
+    df = pd.DataFrame(records)
     # severity_score is derived automatically from severity_class (A=3,B=2,C=1)
     # -- during training this turned out to be REDUNDANT with severity_class
     # (0 feature importance, see feature_importance.png). We keep computing
     # it here only so the feature matrix shape matches what the model expects;
     # it has no real effect on the prediction. Worth mentioning to judges as
     # an honest example of iterative feature refinement.
-    record = dict(record)
-    record["severity_score"] = {"A": 3, "B": 2, "C": 1}.get(record["severity_class"], 1)
+    df["severity_score"] = df["severity_class"].map({"A": 3, "B": 2, "C": 1}).fillna(1).astype(int)
+    df["requires_traffic_or_power_block"] = df["requires_traffic_or_power_block"].map(_as_bool_str)
 
-    df_row = pd.DataFrame([record])
-
+    unseen = [[] for _ in records]
     # Encode categoricals the SAME way as training (critical: must match)
     for col in CATEGORICAL_COLS:
         le = label_encoders[col]
-        val = str(record[col])
-        if val not in le.classes_:
-            # Unseen category (e.g. a brand-new defect type) -- fall back to
-            # the most common class rather than crashing. Flag this so a
-            # human can review it.
-            val = le.classes_[0]
-        df_row[col] = le.transform([val])
+        values = df[col].astype(str)
+        known = values.isin(le.classes_)
+        for i in (~known).to_numpy().nonzero()[0]:
+            # Unseen category (e.g. a brand-new defect type): score it with a
+            # fallback class rather than crashing, and flag it for a human.
+            unseen[i].append(f"{col}={values.iloc[i]}")
+        df[col] = le.transform(values.where(known, le.classes_[0]))
+    return df[FEATURE_COLS], unseen
 
-    X_new = df_row[FEATURE_COLS]
-    proba = float(model.predict_proba(X_new)[0][1])  # probability of "leads to failure"
 
+def _score_fields(record, proba, unseen):
     base_score = proba * 100
     bonus = SAFETY_BONUS.get(record["severity_class"], 0)
     final_score = round(min(100, base_score + bonus), 1)
-
+    explanation = (
+        f"Model estimates {proba*100:.1f}% chance this leads to failure "
+        f"within 90 days, based mainly on severity_class="
+        f"'{record['severity_class']}', days_overdue={record['days_overdue']}, "
+        f"and corridor_traffic_density={record['corridor_traffic_density']}. "
+        + (f"+{bonus} safety bonus applied for Class {record['severity_class']} criticality."
+           if bonus else "No safety bonus (non-critical class).")
+    )
+    if unseen:
+        explanation += (f" NEEDS REVIEW: never seen in training ({', '.join(unseen)}), "
+                        f"scored with a fallback category.")
     return {
         "ml_failure_probability": round(proba, 3),
         "base_score_0_100": round(base_score, 1),
         "safety_bonus_applied": bonus,
-        "final_priority_score": round(final_score, 1),
-        "explanation": (
-            f"Model estimates {proba*100:.1f}% chance this leads to failure "
-            f"within 90 days, based mainly on severity_class="
-            f"'{record['severity_class']}', days_overdue={record['days_overdue']}, "
-            f"and corridor_traffic_density={record['corridor_traffic_density']}. "
-            + (f"+{bonus} safety bonus applied for Class {record['severity_class']} criticality."
-               if bonus else "No safety bonus (non-critical class).")
-        )
+        "final_priority_score": final_score,
+        "explanation": explanation,
+        "needs_review": bool(unseen),
     }
+
+
+def score_record(record: dict) -> dict:
+    """
+    record: dict with keys matching FEATURE_COLS (raw, human-readable values)
+    returns: dict with ml_probability, priority_score (0-100), explanation and needs_review
+    """
+    X_new, unseen = _encode([record])
+    proba = float(model.predict_proba(X_new)[0][1])  # probability of "leads to failure"
+    return _score_fields(record, proba, unseen[0])
+
 
 def score_all_pending_tasks(defect_records: list) -> list:
     """
@@ -180,24 +214,28 @@ def score_all_pending_tasks(defect_records: list) -> list:
                 requires_traffic_or_power_block}, ... ]
             (this exact shape is CONTRACTS.md Interface 1)
 
-    Output: the SAME records, each with 5 new fields added:
+    Output: the SAME records, each with 6 new fields added:
             ml_failure_probability, base_score_0_100,
-            safety_bonus_applied, final_priority_score, explanation
+            safety_bonus_applied, final_priority_score, explanation,
+            needs_review
             (this exact shape is CONTRACTS.md Interface 2)
-            Sorted by final_priority_score, highest first.
+            Sorted by final_priority_score, highest first; ties (many
+            records sit at the 100 cap) broken by ml_failure_probability.
     """
-    scored_list = []
-    for record in defect_records:
-        score_result = score_record(record)
-        # merge the original record's fields with the new score fields
-        # into ONE dictionary, so nothing is lost -- Person 3 gets both
-        # the original defect info AND the priority score together.
-        combined = dict(record)
-        combined.update(score_result)
-        scored_list.append(combined)
+    if not defect_records:
+        return []
+    # One predict call for the whole list: 11,500 records score in about a
+    # second instead of ~35s one row at a time.
+    X_all, unseen = _encode(defect_records)
+    probas = model.predict_proba(X_all)[:, 1]
+    # merge the original record's fields with the new score fields
+    # into ONE dictionary, so nothing is lost -- Person 3 gets both
+    # the original defect info AND the priority score together.
+    scored_list = [{**record, **_score_fields(record, float(p), u)}
+                   for record, p, u in zip(defect_records, probas, unseen)]
 
     # sort so the most urgent task is at the top of the list
-    scored_list.sort(key=lambda r: r["final_priority_score"], reverse=True)
+    scored_list.sort(key=lambda r: (r["final_priority_score"], r["ml_failure_probability"]), reverse=True)
     return scored_list
 
 
@@ -230,9 +268,9 @@ def load_csv_as_records(filepath):
     return records
 
 
-def run_on_file(filename):
+def run_on_file(filename=None):
     """Loads a CSV, scores it, saves <filename>_SCORED.csv, prints a preview."""
-    csv_path = find_prediction_csv()
+    csv_path = find_prediction_csv(filename)
 
     print(f"\nLoading records from: {csv_path}")
     records = load_csv_as_records(csv_path)
@@ -261,4 +299,4 @@ def run_on_file(filename):
 # ENTRY POINT -- handles BOTH ways of running the script
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    run_on_file(None)
+    run_on_file(sys.argv[1] if len(sys.argv) > 1 else None)

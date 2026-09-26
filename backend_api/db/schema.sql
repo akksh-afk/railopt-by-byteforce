@@ -48,6 +48,13 @@ CREATE TABLE IF NOT EXISTS raw_defect_ingest (
     ingested_at               TEXT DEFAULT (datetime('now'))
 );
 
+-- A department's record is ingested once. Connectors use INSERT OR IGNORE
+-- against this, so re-running run_pipeline.py doesn't duplicate raw rows.
+-- (An index rather than a table constraint so it also applies to an
+-- existing railway.db.)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_raw_source
+    ON raw_defect_ingest(department, source_record_id);
+
 -- ---------------------------------------------------------
 -- DEFECT RECORDS (normalized)
 -- Field names are EXACT match to CONTRACTS.md Interface 1.
@@ -79,3 +86,26 @@ CREATE TABLE IF NOT EXISTS defect_records (
 CREATE INDEX IF NOT EXISTS idx_defect_status ON defect_records(status);
 CREATE INDEX IF NOT EXISTS idx_defect_corridor ON defect_records(corridor_id);
 CREATE INDEX IF NOT EXISTS idx_defect_department ON defect_records(department);
+
+-- ---------------------------------------------------------
+-- NOTIFICATIONS (CONTRACTS.md Interface 7)
+-- One row per alert per recipient. The UNIQUE key makes sending
+-- the same event twice a no-op, so pipeline re-runs don't spam.
+-- ref_id is NOT NULL on purpose: SQLite treats NULLs as distinct
+-- inside UNIQUE, so a nullable ref_id would let duplicates in.
+-- ---------------------------------------------------------
+CREATE TABLE IF NOT EXISTS notifications (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_type    TEXT NOT NULL,   -- HIGH_PRIORITY_DEFECT | NEEDS_REVIEW | RECORD_SKIPPED | VALIDATION_FAIL | BLOCK_ASSIGNED
+    severity      TEXT NOT NULL,   -- CRITICAL | HIGH | MODERATE (what the dashboard filters on)
+    recipient     TEXT NOT NULL,   -- 'Controller' or a department name
+    ref_id        TEXT NOT NULL,   -- record_id, block_id, or '<task ids>:<rule_code>'
+    corridor_id   TEXT,
+    title         TEXT NOT NULL,
+    message       TEXT NOT NULL,
+    created_at    TEXT DEFAULT (datetime('now')),
+    read_at       TEXT,
+    UNIQUE (event_type, ref_id, recipient)
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications(recipient, read_at);
